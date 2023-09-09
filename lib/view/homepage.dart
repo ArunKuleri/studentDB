@@ -6,6 +6,11 @@ class HomePage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _dobController = TextEditingController();
+  final _emailController = TextEditingController();
+  DateTime? _selectedDate;
   HomePage({super.key});
   @override
   Widget build(BuildContext context) {
@@ -13,78 +18,168 @@ class HomePage extends StatelessWidget {
       create: (context) => SignInCubit(),
       child: Scaffold(
         appBar: AppBar(
-          title: Text("SDM   "),
+          title: const Text(" SDM   "),
         ),
         body: BlocBuilder<SignInCubit, SignInStatus>(
           builder: (context, state) {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ListView(children: <Widget>[
-                TextFormField(
-                  key: _formKey,
-                  controller: _usernameController,
-                  decoration: InputDecoration(
-                      labelText: "Username",
-                      errorText: _formKey.currentState?.validate() ?? false
-                          ? 'please enter your username'
-                          : null),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "please enter your username";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(
-                  height: 16.0,
-                ),
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(labelText: "password"),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "please enter your password";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(
-                  height: 16.0,
-                ),
-                if (state == SignInStatus.signUp)
-                  TextFormField(
-                    decoration: InputDecoration(labelText: "confirm password"),
-                    validator: (value) {
-                      if (value != _passwordController.text) {
-                        return "password do not match";
-                      }
-                      return null;
-                    },
+            return Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ListView(children: <Widget>[
+                  if (state == SignInStatus.signUp)
+                    TextFormField(
+                      controller: _usernameController,
+                      decoration: const InputDecoration(
+                        labelText: "Username",
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "please enter your username";
+                        }
+                        return null;
+                      },
+                    ),
+                  const SizedBox(
+                    height: 16.0,
                   ),
-                const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState?.validate() ?? false) {
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text("please enter value"),
-                      ));
-                    }
-                  },
-                  child:
-                      Text(state == SignInStatus.login ? "Login" : "Sign Up"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    state == SignInStatus.login
-                        ? context.read<SignInCubit>().showSignup()
-                        : context.read<SignInCubit>().showLogin();
-                  },
-                  child: Text(state == SignInStatus.login
-                      ? "I don't have an account"
-                      : 'I already have an account'),
-                )
-              ]),
+                  if (state == SignInStatus.signUp)
+                    TextFormField(
+                      controller: _passwordController,
+                      decoration: const InputDecoration(labelText: "password"),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "please enter your password";
+                        } else if (value.length < 8 ||
+                            !value.contains(RegExp(r'/d')) ||
+                            !value
+                                .contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+                          return "Password must be at least 8 characters long and contain at least one number and one special character";
+                        }
+                        return null;
+                      },
+                    ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  if (state == SignInStatus.login)
+                    TextFormField(
+                      controller: _firstNameController,
+                      decoration:
+                          const InputDecoration(labelText: "First Name"),
+                    ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  if (state == SignInStatus.login)
+                    TextFormField(
+                      controller: _lastNameController,
+                      decoration: const InputDecoration(labelText: "Last Name"),
+                    ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  if (state == SignInStatus.login)
+                    TextFormField(
+                      controller: _passwordController,
+                      decoration: const InputDecoration(labelText: "password"),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "please enter your password";
+                        } else if (value.length < 8 ||
+                            !value.contains(RegExp(r'/d')) ||
+                            !value
+                                .contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+                          return "Password must be at least 8 characters long and contain at least one number and one special character";
+                        }
+                        return null;
+                      },
+                    ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  if (state == SignInStatus.login)
+                    TextFormField(
+                      controller: _passwordController,
+                      decoration:
+                          const InputDecoration(labelText: "confirm password"),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "please enter your password";
+                        } else if (value.length < 8 ||
+                            !value.contains(RegExp(r'/d')) ||
+                            !value
+                                .contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+                          return "Password must be at least 8 characters long and contain at least one number and one special character";
+                        }
+                        return null;
+                      },
+                    ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  if (state == SignInStatus.login)
+                    TextFormField(
+                      controller: _dobController,
+                      decoration:
+                          const InputDecoration(labelText: "Date of Birth"),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "pleaase enter your date of birth";
+                        }
+                        return null;
+                      },
+                      onTap: () async {
+                        final DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(1900),
+                          lastDate: DateTime.now(),
+                        );
+                        if (pickedDate != null) {
+                          _selectedDate = pickedDate;
+                          _dobController.text = pickedDate.toString();
+                        }
+                      },
+                    ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  if (state == SignInStatus.login)
+                    TextFormField(
+                      controller: _emailController,
+                      decoration:
+                          const InputDecoration(labelText: "Email Address"),
+                    ),
+                  const SizedBox(height: 16.0),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState?.validate() ?? false) {
+                      } else {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text("please enter value"),
+                        ));
+                      }
+                    },
+                    child:
+                        Text(state == SignInStatus.login ? "Login" : "Sign Up"),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      state == SignInStatus.login
+                          ? context.read<SignInCubit>().showSignup()
+                          : context.read<SignInCubit>().showLogin();
+                    },
+                    child: Text(state == SignInStatus.login
+                        ? "I don't have an account"
+                        : 'I already have an account'),
+                  )
+                ]),
+              ),
             );
           },
         ),
