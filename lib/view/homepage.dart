@@ -11,6 +11,17 @@ class HomePage extends StatelessWidget {
   final _dobController = TextEditingController();
   final _emailController = TextEditingController();
   DateTime? _selectedDate;
+  final List<String> bloodGroups = [
+    'A+ve',
+    'A-ve',
+    'B+ve',
+    'B-ve',
+    'O+ve',
+    'O-ve',
+    'AB+ve',
+    'AB-ve',
+  ];
+  String? selectedBloodGroup;
   HomePage({super.key});
   @override
   Widget build(BuildContext context) {
@@ -27,7 +38,7 @@ class HomePage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ListView(children: <Widget>[
-                  if (state == SignInStatus.signUp)
+                  if (state == SignInStatus.login)
                     TextFormField(
                       controller: _usernameController,
                       decoration: const InputDecoration(
@@ -43,6 +54,43 @@ class HomePage extends StatelessWidget {
                   const SizedBox(
                     height: 16.0,
                   ),
+                  if (state == SignInStatus.login)
+                    TextFormField(
+                      controller: _passwordController,
+                      decoration: const InputDecoration(labelText: "password"),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "please enter your password";
+                        } else if (value.length < 8 ||
+                            !value.contains(RegExp(r'/d')) ||
+                            !value
+                                .contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+                          return "Password must be at least 8 characters long and contain at least one number and one special character";
+                        }
+                        return null;
+                      },
+                    ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  if (state == SignInStatus.signUp)
+                    TextFormField(
+                      controller: _firstNameController,
+                      decoration:
+                          const InputDecoration(labelText: "First Name"),
+                    ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  if (state == SignInStatus.signUp)
+                    TextFormField(
+                      controller: _lastNameController,
+                      decoration: const InputDecoration(labelText: "Last Name"),
+                    ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
                   if (state == SignInStatus.signUp)
                     TextFormField(
                       controller: _passwordController,
@@ -60,47 +108,7 @@ class HomePage extends StatelessWidget {
                         return null;
                       },
                     ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  if (state == SignInStatus.login)
-                    TextFormField(
-                      controller: _firstNameController,
-                      decoration:
-                          const InputDecoration(labelText: "First Name"),
-                    ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  if (state == SignInStatus.login)
-                    TextFormField(
-                      controller: _lastNameController,
-                      decoration: const InputDecoration(labelText: "Last Name"),
-                    ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  if (state == SignInStatus.login)
-                    TextFormField(
-                      controller: _passwordController,
-                      decoration: const InputDecoration(labelText: "password"),
-                      obscureText: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "please enter your password";
-                        } else if (value.length < 8 ||
-                            !value.contains(RegExp(r'/d')) ||
-                            !value
-                                .contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
-                          return "Password must be at least 8 characters long and contain at least one number and one special character";
-                        }
-                        return null;
-                      },
-                    ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  if (state == SignInStatus.login)
+                  if (state == SignInStatus.signUp)
                     TextFormField(
                       controller: _passwordController,
                       decoration:
@@ -121,7 +129,7 @@ class HomePage extends StatelessWidget {
                   const SizedBox(
                     height: 16.0,
                   ),
-                  if (state == SignInStatus.login)
+                  if (state == SignInStatus.signUp)
                     TextFormField(
                       controller: _dobController,
                       decoration:
@@ -148,11 +156,32 @@ class HomePage extends StatelessWidget {
                   const SizedBox(
                     height: 16.0,
                   ),
-                  if (state == SignInStatus.login)
-                    TextFormField(
-                      controller: _emailController,
-                      decoration:
-                          const InputDecoration(labelText: "Email Address"),
+                  if (state == SignInStatus.signUp)
+                    DropdownButtonFormField<String>(
+                      value: selectedBloodGroup,
+                      onChanged: (String? newValue) {
+                        selectedBloodGroup = newValue;
+                      },
+                      items: bloodGroups
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      decoration: const InputDecoration(
+                        labelText: 'Blood Group',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "please select your blood group";
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        // Save the selected blood group
+                        selectedBloodGroup = value;
+                      },
                     ),
                   const SizedBox(height: 16.0),
                   ElevatedButton(
