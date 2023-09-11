@@ -271,7 +271,7 @@ class _HomePageState extends State<HomePage> {
                           division: _division.text,
                         );
                         final dbHelper = DatabaseHelper();
-                        final   = await dbHelper.insertUser(user);
+                        final userId = await dbHelper.insertUser(user);
                       } else {
                         ScaffoldMessenger.of(context)
                             .showSnackBar(const SnackBar(
