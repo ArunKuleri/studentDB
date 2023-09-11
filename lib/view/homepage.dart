@@ -1,16 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sd/controller/sign_in_bloc/cubit/sign_in_cubit.dart';
+import 'package:sd/model/studentdB.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final _formKey = GlobalKey<FormState>();
+
   final _usernameController = TextEditingController();
+
   final _passwordController = TextEditingController();
+
   final _firstNameController = TextEditingController();
+
   final _lastNameController = TextEditingController();
+
   final _dobController = TextEditingController();
+
   final _emailController = TextEditingController();
+
+  final _selectBloodGroup = TextEditingController();
+
+  final _division = TextEditingController();
+  String password = '';
+  String email = "";
+  String username = "";
+  String FirstName = "";
+  String LastName = "";
+  String DOB = "";
   DateTime? _selectedDate;
+
   final List<String> bloodGroups = [
     'A+ve',
     'A-ve',
@@ -21,8 +46,11 @@ class HomePage extends StatelessWidget {
     'AB+ve',
     'AB-ve',
   ];
+
   String? selectedBloodGroup;
-  HomePage({super.key});
+
+  String? selectDivision;
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -50,6 +78,11 @@ class HomePage extends StatelessWidget {
                         }
                         return null;
                       },
+                      onSaved: (newValue) {
+                        setState(() {
+                          username = newValue!;
+                        });
+                      },
                     ),
                   const SizedBox(
                     height: 16.0,
@@ -62,13 +95,15 @@ class HomePage extends StatelessWidget {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "please enter your password";
-                        } else if (value.length < 8 ||
-                            !value.contains(RegExp(r'/d')) ||
-                            !value
-                                .contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
-                          return "Password must be at least 8 characters long and contain at least one number and one special character";
+                        } else if (value.length < 8) {
+                          return "Password must be at least 8 characters long ";
                         }
                         return null;
+                      },
+                      onSaved: (newValue) {
+                        setState(() {
+                          password = newValue!;
+                        });
                       },
                     ),
                   const SizedBox(
@@ -79,6 +114,11 @@ class HomePage extends StatelessWidget {
                       controller: _firstNameController,
                       decoration:
                           const InputDecoration(labelText: "First Name"),
+                      onSaved: (newValue) {
+                        setState(() {
+                          FirstName = newValue!;
+                        });
+                      },
                     ),
                   const SizedBox(
                     height: 16.0,
@@ -87,6 +127,11 @@ class HomePage extends StatelessWidget {
                     TextFormField(
                       controller: _lastNameController,
                       decoration: const InputDecoration(labelText: "Last Name"),
+                      onSaved: (newValue) {
+                        setState(() {
+                          LastName = newValue!;
+                        });
+                      },
                     ),
                   const SizedBox(
                     height: 16.0,
@@ -99,11 +144,8 @@ class HomePage extends StatelessWidget {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "please enter your password";
-                        } else if (value.length < 8 ||
-                            !value.contains(RegExp(r'/d')) ||
-                            !value
-                                .contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
-                          return "Password must be at least 8 characters long and contain at least one number and one special character";
+                        } else if (value.length < 8) {
+                          return "Password must be at least 8 characters long";
                         }
                         return null;
                       },
@@ -117,13 +159,15 @@ class HomePage extends StatelessWidget {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "please enter your password";
-                        } else if (value.length < 8 ||
-                            !value.contains(RegExp(r'/d')) ||
-                            !value
-                                .contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
-                          return "Password must be at least 8 characters long and contain at least one number and one special character";
+                        } else if (value.length < 8) {
+                          return "Password must be at least 8 characters";
                         }
                         return null;
+                      },
+                      onSaved: (value) {
+                        setState(() {
+                          password = value!;
+                        });
                       },
                     ),
                   const SizedBox(
@@ -151,6 +195,11 @@ class HomePage extends StatelessWidget {
                           _selectedDate = pickedDate;
                           _dobController.text = pickedDate.toString();
                         }
+                      },
+                      onSaved: (newValue) {
+                        setState(() {
+                          DOB = newValue!;
+                        });
                       },
                     ),
                   const SizedBox(
@@ -184,9 +233,45 @@ class HomePage extends StatelessWidget {
                       },
                     ),
                   const SizedBox(height: 16.0),
+                  if (state == SignInStatus.signUp)
+                    DropdownButtonFormField<String>(
+                      value: selectDivision,
+                      onChanged: (String? newValue) {
+                        selectDivision = newValue;
+                      },
+                      items: ['A', 'B', 'C', 'D', 'E']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                            value: value, child: Text(value));
+                      }).toList(),
+                      decoration: const InputDecoration(
+                        labelText: "Division",
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "please select a division";
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        selectDivision = value;
+                      },
+                    ),
+                  const SizedBox(height: 16.0),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState?.validate() ?? false) {
+                        final user = User(
+                          username: _usernameController.text,
+                          password: _passwordController.text,
+                          firstName: _firstNameController.text,
+                          lastName: _lastNameController.text,
+                          dob: _dobController.text,
+                          bloodGroup: _selectBloodGroup.text,
+                          division: _division.text,
+                        );
+                        final dbHelper = DatabaseHelper();
+                        final   = await dbHelper.insertUser(user);
                       } else {
                         ScaffoldMessenger.of(context)
                             .showSnackBar(const SnackBar(
