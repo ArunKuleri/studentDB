@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sd/controller/sign_in_bloc/cubit/sign_in_cubit.dart';
 import 'package:sd/model/studentdB.dart';
+import 'package:sd/view/add_student/profilePage.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({super.key});
@@ -272,6 +273,12 @@ class _HomePageState extends State<HomePage> {
                         );
                         final dbHelper = DatabaseHelper();
                         final userId = await dbHelper.insertUser(user);
+                        // ignore: use_build_context_synchronously
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProfilePage()),
+                        );
                       } else {
                         ScaffoldMessenger.of(context)
                             .showSnackBar(const SnackBar(

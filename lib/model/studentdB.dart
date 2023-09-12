@@ -1,6 +1,7 @@
 // import 'package:sqflite/sqflite.dart';
 
 // ignore: depend_on_referenced_packages
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -25,23 +26,47 @@ class DatabaseHelper {
     return await openDatabase(path, version: 1,
         onCreate: (Database db, int version) async {
       await db.execute('''
-        CREATE TABLE users (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          username TEXT,
-          password TEXT,
-          firstName TEXT,
-          lastName TEXT,
-          dob TEXT,
-          bloodGroup TEXT,
-          division TEXT
-        )
-      ''');
+      CREATE TABLE users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        password TEXT,
+        firstName TEXT,
+        lastName TEXT,
+        dob TEXT,
+        bloodGroup TEXT,
+        division TEXT,
+        createdAt TEXT
+      )
+    ''');
     });
   }
 
   Future<int> insertUser(User user) async {
     final db = await database;
     return await db.insert('users', user.toMap());
+  }
+
+  Future<List<User>> getUsers() async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> maps = await db.query('users');
+    return List.generate(maps.length, (index) {
+      return User(
+          username: maps[index]['''
+username'''],
+          password: maps[index]['''
+password'''],
+          firstName: maps[index]['''
+firstName'''],
+          lastName: maps[index]['''
+lastName'''],
+          dob: maps[index]["""
+dob"""],
+          bloodGroup: maps[index]["""
+bloodGroup"""],
+          division: maps[index]["""
+division"""]);
+    });
   }
 }
 
